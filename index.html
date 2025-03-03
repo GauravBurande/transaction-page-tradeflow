@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradeflow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Super Dark Gray Background */
+        body {
+            background: #1a1a1a;
+            /* Deep, rich dark gray */
+        }
+
+        /* Clean Card Styling */
+        .clean-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .clean-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ultra-Clean Table Styling with Sharp, Minimal Borders */
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+            /* Slightly smaller font for a sleek look */
+            background: transparent;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* Subtle, sharp borders */
+            padding: 0.75rem 1rem;
+            /* Precise padding for alignment */
+            text-align: left;
+            font-weight: 500;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            color: #a0a0a0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Table Row Hover Effect - Subtle and Elegant */
+        tbody tr {
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: scale(1.005);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Type Badge Styling with Glow Animation */
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .glow-buy {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border-color: rgba(74, 222, 128, 0.3);
+            animation: glowGreen 1.5s infinite;
+        }
+
+        .glow-sell {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.3);
+            animation: glowRed 1.5s infinite;
+        }
+
+        @keyframes glowGreen {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+
+        @keyframes glowRed {
+            0% {
+                box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(248, 113, 113, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+            }
+        }
+
+        /* Token Name Styling */
+        .token-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .token-name img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .token-name strong {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* Data Colors */
+        .green-text {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .red-text {
+            color: #f87171;
+            font-weight: 600;
+        }
+
+        .gray-text {
+            color: #a0a0a0;
+            font-weight: 400;
+        }
+
+        /* Custom Scrollbar */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #ba68c8;
+            /* Purple from your palette */
+            border-radius: 3px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            /* Darker gray for contrast */
+        }
+
+        /* Fade-in Animation for Table Rows (Subtle) */
+        tbody tr {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Menu Styling (Unchanged from previous) */
+        .mobile-menu {
+            display: none;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #1a1a1a;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 0.5rem;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu a {
+                display: block;
+                padding: 0.75rem 1.5rem;
+                color: #ffffff;
+                text-decoration: none;
+                font-size: 0.875rem;
+                transition: background 0.3s ease;
+            }
+
+            .mobile-menu a:hover {
+                background: rgba(255, 255, 255, 0.03);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white min-h-screen font-sans">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <header class="py-4 border-b border-gray-700/30 flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="https://tradeflow.fun/images/logo_light.svg" alt="Tradeflow Logo" class="h-6 w-auto">
+            </div>
+            <div class="flex items-center">
+                <div class="text-sm text-gray-400 opacity-70 md:hidden">
+                    <span class="hamburger">☰</span>
+                </div>
+                <div class="hidden md:flex space-x-4 text-sm text-gray-400 opacity-70">
+                    <a href="#" class="hover:text-purple-400">Login/Sign up</a>
+                    <a href="#" class="hover:text-purple-400">Dashboard</a>
+                    <a href="#" class="hover:text-purple-400">Blog</a>
+                    <a href="#" class="hover:text-purple-400">Launchpad</a>
+                </div>
+                <div class="mobile-menu md:hidden">
+                    <a href="#" class="block hover:text-purple-400">Login/Sign up</a>
+                    <a href="#" class="block hover:text-purple-400">Dashboard</a>
+                    <a href="#" class="block hover:text-purple-400">Blog</a>
+                    <a href="#" class="block hover:text-purple-400">Launchpad</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Account Info Section -->
+        <div class="mt-10">
+            <h2 class="text-2xl font-semibold tracking-wide">
+                Transactions for <span class="text-purple-400 opacity-90">@pump.notfun</span>
+            </h2>
+            <p class="text-sm mt-2 text-gray-400 opacity-60">
+                Last synced: <span class="text-purple-400 opacity-85 font-medium">23s ago</span>
+            </p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <!-- Win Rate Card -->
+            <div class="clean-card rounded-lg p-6">
+                <p class="text-gray-400 opacity-70 text-sm uppercase tracking-wider">Win Rate</p>
+                <p class="text-4xl font-bold mt-2 text-green-400 opacity-95">22.41%</p>
+                <p class="text-xs text-gray-500 opacity-50 mt-1">58 trades analyzed</p>
+            </div>
+
+            <!-- Total Profit Card -->
+            <div class="clean-card rounded-lg p-6">
+                <p class="text-gray-400 opacity-70 text-sm uppercase tracking-wider">Total Profit</p>
+                <p class="text-4xl font-bold mt-2 text-red-400 opacity-95">-1.910 SOL</p>
+                <p class="text-xs text-gray-500 opacity-50 mt-1">All-time P&L</p>
+            </div>
+
+            <!-- Average Trade Size Card -->
+            <div class="clean-card rounded-lg p-6">
+                <p class="text-gray-400 opacity-70 text-sm uppercase tracking-wider">Avg. Trade Size</p>
+                <p class="text-4xl font-bold mt-2 text-purple-400 opacity-95">0.738 SOL</p>
+                <p class="text-xs text-gray-500 opacity-50 mt-1">Median: 0.62 SOL</p>
+            </div>
+        </div>
+
+        <!-- Ultra-Clean, Crisp Table with Sharp Edges -->
+        <div class="mt-12 overflow-x-auto rounded-lg border border-gray-700/20 shadow-md">
+            <table class="min-w-full bg-transparent">
+                <thead>
+                    <tr class="text-left text-gray-400 opacity-80 border-b border-gray-700/30">
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Type</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Token</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Total SOL</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Amount</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Price</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Holding</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Profit</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Balance</th>
+                        <th class="py-3 px-4 text-sm font-semibold uppercase tracking-wider">Datetime</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-sell">Sell</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>GEKKON Larins Lizard</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">0.84 SOL</td>
+                        <td class="py-3 px-4 gray-text">965197.82</td>
+                        <td class="py-3 px-4 gray-text">$0.00001228</td>
+                        <td class="py-3 px-4 gray-text">0</td>
+                        <td class="py-3 px-4 green-text">+0.34</td>
+                        <td class="py-3 px-4 green-text">1457.07 SOL</td>
+                        <td class="py-3 px-4 gray-text">02/03/2025, 19:52:22</td>
+                    </tr>
+
+                    <!-- Row 2 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-buy">Buy</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>GEKKON Larins Lizard</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">0.5 SOL</td>
+                        <td class="py-3 px-4 gray-text">965197.82</td>
+                        <td class="py-3 px-4 gray-text">$0.00008698</td>
+                        <td class="py-3 px-4 gray-text">965197.82</td>
+                        <td class="py-3 px-4 gray-text">-</td>
+                        <td class="py-3 px-4 green-text">1456.23 SOL</td>
+                        <td class="py-3 px-4 gray-text">02/03/2025, 19:51:53</td>
+                    </tr>
+
+                    <!-- Row 3 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-sell">Sell</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>BEBO</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">1.96 SOL</td>
+                        <td class="py-3 px-4 gray-text">3138651.65</td>
+                        <td class="py-3 px-4 gray-text">$0.00008758</td>
+                        <td class="py-3 px-4 gray-text">0</td>
+                        <td class="py-3 px-4 red-text">-0.04</td>
+                        <td class="py-3 px-4 green-text">1456.73 SOL</td>
+                        <td class="py-3 px-4 gray-text">01/03/2025, 18:11:04</td>
+                    </tr>
+
+                    <!-- Row 4 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-buy">Buy</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>BEBO</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">2 SOL</td>
+                        <td class="py-3 px-4 gray-text">3138651.65</td>
+                        <td class="py-3 px-4 gray-text">$0.00009426</td>
+                        <td class="py-3 px-4 gray-text">3138651.65</td>
+                        <td class="py-3 px-4 gray-text">-</td>
+                        <td class="py-3 px-4 green-text">1454.77 SOL</td>
+                        <td class="py-3 px-4 gray-text">01/03/2025, 18:10:57</td>
+                    </tr>
+
+                    <!-- Row 5 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-sell">Sell</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>Benni on sol</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">4.91 SOL</td>
+                        <td class="py-3 px-4 gray-text">2891971773.96</td>
+                        <td class="py-3 px-4 gray-text">$0.0000002381</td>
+                        <td class="py-3 px-4 gray-text">0</td>
+                        <td class="py-3 px-4 red-text">-0.09</td>
+                        <td class="py-3 px-4 green-text">1456.77 SOL</td>
+                        <td class="py-3 px-4 gray-text">01/03/2025, 18:04:47</td>
+                    </tr>
+
+                    <!-- Row 6 -->
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="type-badge glow-buy">Buy</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="token-name">
+                                <img src="https://dd.dexscreener.com/ds-data/tokens/solana/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN.png"
+                                    alt="Token Icon">
+                                <strong>Benni on sol</strong>
+                                <span class="ml-2 text-gray-400 flex items-center space-x-2">
+                                    <a href="https://solscan.io" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10zM6.465 5.501a.386.386 0 00-.266.11L4.39 7.42a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.109l1.81-1.81a.188.188 0 00-.133-.32H6.465zm0 6.758a.376.376 0 00-.266.11l-1.81 1.81a.188.188 0 00.133.32h9.164c.101 0 .197-.04.266-.11l1.81-1.81a.188.188 0 00-.133-.32H6.465zm7.487-3.289a.376.376 0 00-.266-.11H4.522a.188.188 0 00-.133.321l1.81 1.81c.07.07.165.11.266.11h9.164a.188.188 0 00.133-.32l-1.81-1.81z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <a href="https://dexscreener.com" target="_blank">
+                                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 13 16">
+                                            <g clip-path="url(#clip0_2139_18)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M7.83193 5.69952C8.30535 5.45547 8.90773 5.09621 9.51084 4.604C9.638 4.87701 9.65193 5.11525 9.58642 5.30763C9.53999 5.4432 9.4525 5.56112 9.33746 5.65493C9.21287 5.75632 9.05728 5.83013 8.88529 5.87003C8.55895 5.94603 8.17793 5.90165 7.83193 5.69952ZM7.91401 8.20011L8.54069 8.57435C7.26112 9.31579 6.91326 10.6925 6.50005 12.0335C6.08689 10.6925 5.73898 9.31579 4.45946 8.57435L5.08615 8.20011C5.14677 8.17642 5.19859 8.1335 5.23417 8.07751C5.26975 8.02151 5.28728 7.9553 5.28424 7.88837C5.22682 6.63253 5.55482 6.07717 5.99723 5.72848C6.15591 5.60357 6.32914 5.54085 6.50005 5.54085C6.67096 5.54085 6.84419 5.60357 7.00292 5.72848C7.44534 6.07717 7.77333 6.63253 7.71591 7.88837C7.71287 7.9553 7.7304 8.02151 7.76598 8.07751C7.80157 8.1335 7.85338 8.17642 7.91401 8.20011ZM6.50005 0C7.22444 0.0201067 7.95063 0.165493 8.58088 0.44832C9.0173 0.644427 9.42453 0.903467 9.79328 1.21323C9.9598 1.35307 10.0969 1.48816 10.248 1.64368C10.6554 1.65824 11.2507 1.19035 11.5271 0.752533C11.0514 2.3648 8.88075 4.26875 7.37796 4.99728C7.37734 4.99701 7.37693 4.99664 7.37647 4.99632C7.10677 4.78341 6.80344 4.67696 6.50005 4.67696C6.19667 4.67696 5.89338 4.78341 5.62369 4.99632C5.62322 4.99659 5.62281 4.99707 5.62219 4.99728C4.11935 4.26875 1.94871 2.3648 1.47302 0.752533C1.74938 1.19035 2.34474 1.65824 2.75213 1.64368C2.90323 1.48821 3.04035 1.35307 3.20682 1.21323C3.57557 0.903467 3.9828 0.644427 4.41922 0.44832C5.04952 0.165493 5.77571 0.0201067 6.50005 0Z"
+                                                    fill="#ACA8A8"></path>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_2139_18">
+                                                    <rect width="13" height="16" fill="white"></rect>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 green-text">5 SOL</td>
+                        <td class="py-3 px-4 gray-text">2891971773.96</td>
+                        <td class="py-3 px-4 gray-text">$0.0000002381</td>
+                        <td class="py-3 px-4 gray-text">2891971773.96</td>
+                        <td class="py-3 px-4 gray-text">-</td>
+                        <td class="py-3 px-4 green-text">1451.86 SOL</td>
+                        <td class="py-3 px-4 gray-text">01/03/2025, 18:02:31</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.hamburger').addEventListener('click', function () {
+            document.querySelector('.mobile-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>
